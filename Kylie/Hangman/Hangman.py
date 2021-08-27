@@ -1,61 +1,65 @@
-from Learning.Kylie.Hangman.Hangman_Words import words
-import random, time, string
+import string
+import random
+from Hangman_Words import words
 
 def get_valid_word(words):
-    # choose a random word from the Wordlist to play on
-    word = random.choice(words)
-    #check if word is valid
-    while "-" in word or ' ' in word:
+    word = random.choice(words) #randomly chooses something from the list
+    while '-' in word or ' ' in word:
         word = random.choice(words)
-
+    
     return word
 
 def hangman():
-    word = get_valid_word(words)
-    word_letters = set(word)
+    word = get_valid_word(words).upper()
+    word = word.upper()
+    word_letters = set(word)#letters in the word
     alphabet = set(string.ascii_uppercase)
-    used_letters = set()
-    lives = 5
-    # Pseudoword is used to give the Player the Position of the letters already guessed right in the word with "_" where he
-    # Has not yet been able to guess the correct letter
-    pseudoword = ""
+    used_letters = set() #what the user has guessed
 
+    lives = 6
 
-    while word_letters != [] and lives > 0:
-        print(f"Your used letters are: {', '.join(used_letters)}")
-        for i in word_letters:
-            if i in used_letters:
-                pseudoword = pseudoword + i
+    print('Howdy :D I guess you know how it goes :) \n')
+    while len(word_letters) > 0 and lives > 0:
+
+        #show the player the already used words
+        print(f'You have {lives} lives left and you already used these letters: ' + ' '.join(used_letters)) 
+
+        #show the word but only the letters, the player already guessed (e.g H O - S E -> HOUSE)
+        word_list = [letter if letter in used_letters else '-' for letter in word]
+        print('Current word: ', ' '.join(word_list))
+
+        user_letter = input('Guess a letter: ').upper() #get user input for the letter and format everything upper case 
+       
+        if user_letter in alphabet - used_letters:
+            used_letters.add(user_letter) #add letter to the used letters if the letter is not used so far
+
+            if user_letter in word_letters: #remove all the correctly guessed letters from the word 
+                word_letters.remove(user_letter)
+                lives += 1
+                print(' \n Correct :D on to the next one. I was so generous to give you one live back :D\n')
             else:
-               pseudoword = pseudoword + "_"
+                print('\n I\'m sorry but that letter is not in the word D: \n')
+                lives = lives - 1 # This means that the user guessed a wrong letter and thus looses one live
 
-        print(f"To give you mere mortal hint :D {pseudoword}")
-        user_input = (input("Guess a letter of the word:")).upper()
-
-        # Add Letter to ued letters only if the letter is nt yet used
-        if user_input in alphabet - used_letters:
-          used_letters.add(user_input)
-
-        if user_input in word_letters:
-            word_letters.remove(user_input)
-            print(f"Yup, the letter {user_input} is in the word !")
-            # Just a timer to model a more player like behavior from the computer
-            time.sleep(1)
-
-        elif user_input in used_letters:
-            lives = lives - 1
-            print(f"You already tried {user_input}, Pick another one")
-            time.sleep(1)
-
+        elif user_letter in used_letters:
+            print('\n You have already used that letter :P Try Again \n') #lives stay the same, otherwise its too hard
+        
+        
         else:
+            print('\n Invalid character :D Don\'t worry, just try again \n')
             lives = lives - 1
-            print(f"It appears, {user_input} is not a valid input (A-Z,a-z), Pick another one")
-            time.sleep(1)
-
+    
     if lives == 0:
-        print("Sorry, out of tries")
-    elif word_letters == []:
-        print(f"Congrats, {word} was the word, You nailed it !")
+        print(f'I\m sorry, you died :/ But you can try again :D The word was {word} \n')
+    
+    else:
+        print(f'Right the word was {word}. Congrats, you won :D \n')
+
+    if input('Do you wanna play again ? y/n') == y:
+        return hangman()
+    else:
+        return
+
 
 if __name__ == '__main__':
     hangman()
