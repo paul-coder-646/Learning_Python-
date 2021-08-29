@@ -1,4 +1,5 @@
-from player import HumanPlayer, RandomComputerPlayer
+from player import HumanPlayer, RandomComputerPlayer, GeniusComputerPlayer
+import time
 
 class TicTacToe:
     def __init__(self):
@@ -58,12 +59,17 @@ class TicTacToe:
                 return True
 
 def play(game, x_player, y_player, print_game=True):
-    if print_game:
-        game.print_board_nums()
 
     letter = 'X' # Starting letter
 
     while game.empty_squares():
+
+        if print_game and letter == 'X': # In case the Human Plays, give him the board for orientation 
+            game.print_board_nums()
+
+        if letter == 'O': # To make it feel a little bit more human, when the computer plays
+            time.sleep(1)
+
         if letter == 'O':
             square = y_player.get_Move(game)
             # Get the Moves of the Players ready. The moves are NOT yet taken
@@ -91,6 +97,6 @@ def play(game, x_player, y_player, print_game=True):
 
 if __name__ == '__main__':
     x_player = HumanPlayer('X')
-    y_player = RandomComputerPlayer('O')
+    y_player = GeniusComputerPlayer('O')
     t = TicTacToe()
     play(t, x_player, y_player, print_game=True)
