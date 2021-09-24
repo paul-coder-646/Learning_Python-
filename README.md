@@ -1,4 +1,4 @@
-# Learning_Python
+# Learning_Python :blush:
 ### following the tutorial by Kylie Ying (https://github.com/kying18)
 
 ## Some things to keep in mind:
