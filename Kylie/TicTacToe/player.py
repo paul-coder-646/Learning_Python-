@@ -56,10 +56,13 @@ class GeniusComputerPlayer(Player):
         # base case for recursion
         if state.current_winner == other_player:
             # return position and score for minimax to work
-            return {'position': None,
-            'score': 1 * (state.num_empty_squares() + 1) 
-            if other_player == max_player 
-            else -1 * (state.num_empty_squares() + 1)}
+            # If our adversary is the one specified as "player" in the function call than automatically we are "other_player"
+            # If however we so "max_player" is the one specified in the function call then our adversary becomes "other_player"
+            return 
+            {
+                'position': None,
+                'score': 1 * (state.num_empty_squares() + 1) if other_player == max_player else -1 * (state.num_empty_squares() + 1)
+            }
         
         elif not state.empty_squares(): # Well if nobody won, then we must have a tie
             return {'position': None, 'score': 0}
