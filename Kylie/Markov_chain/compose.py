@@ -1,82 +1,72 @@
-"""
-Implemented Markov Chain Composer by Kylie Ying
-
-YouTube Kylie Ying: https://www.youtube.com/ycubed 
-Twitch KylieYing: https://www.twitch.tv/kylieying 
-Twitter @kylieyying: https://twitter.com/kylieyying 
-Instagram @kylieyying: https://www.instagram.com/kylieyying/ 
-Website: https://www.kylieying.com
-Github: https://www.github.com/kying18 
-Programmer Beast Mode Spotify playlist: https://open.spotify.com/playlist/4Akns5EUb3gzmlXIdsJkPs?si=qGc4ubKRRYmPHAJAIrCxVQ 
-"""
-
 import os
 import re
 import string
 import random
+
 from graph import Graph, Vertex
 
 def get_words_from_text(text_path):
-    with open(text_path, 'rb') as file:
-        text = file.read().decode("utf-8") 
+    with open(text_path, 'r') as f:
+        text = f.read()
 
-        # remove [verse 1: artist]
-        # include the following line if you are doing song lyrics
-        # text = re.sub(r'\[(.+)\]', ' ', text)
+        # this removes excess whitespaces and makes spaces uniform
+        # text      that look  like this -> text that looks like this
+        text = ' '.join(text.split()) 
+        text = text.lower() # makes everything lowercase
 
-        text = ' '.join(text.split())
-        text = text.lower()
+        # removes all punctuation as that would make a markov chain impossibly difficult
+        # as Hello. and Hello wouldn't be considered equal for example
         text = text.translate(str.maketrans('', '', string.punctuation))
 
-    words = text.split()
-
-    words = words[:1000]
-
-    return words
-
+        words = text.split() # make list again 
+        return words
 
 def make_graph(words):
     g = Graph()
-    prev_word = None
+
+    previous_word = None
+
     # for each word
     for word in words:
-        # check that word is in graph, and if not then add it
+
+        # check that word is in the graph, and if not then add it
         word_vertex = g.get_vertex(word)
+        # if there was a previeous word, then add an edge if it does not already exit
+        if previous_word:
+            previous_word.increment_edge(word_vertex)
+        # in the graph otherwise increment weight by 1
+        # set our word to the previous word and iterate!
+        previous_word = word_vertex
 
-        # if there was a previous word, then add an edge if does not exist
-        # if exists, increment weight by 1
-        if prev_word:  # prev word should be a Vertex
-            # check if edge exists from previous word to current word
-            prev_word.increment_edge(word_vertex)
-
-        prev_word = word_vertex
-
+    # remember, we want ot generate the probability mappings for each vertex
+    # this is a good place to do it before we return the graph, as we possess all
+    # the neccesary info already.
     g.generate_probability_mappings()
-    
+
     return g
 
 def compose(g, words, length=50):
     composition = []
-    word = g.get_vertex(random.choice(words))
+    
+    word = g.get_vertex(random.choice(words)) # pick a random word to start!
     for _ in range(length):
         composition.append(word.value)
         word = g.get_next_word(word)
 
     return composition
 
-
 def main():
-    words = get_words_from_text('texts/hp_sorcerer_stone.txt')
+    # step 1: get words from text
+    words = get_words_from_text('Learning/Kylie/Markov_chain/texts/hp_sorcerer_stone.txt')
 
-    # for song in os.listdir('songs/{}'.format(artist)):
-        # if song == '.DS_Store':
-        #     continue
-        # words.extend(get_words_from_text('songs/{artist}/{song}'.format(artist=artist, song=song)))
-        
+    # step 2: create a graph from the words
     g = make_graph(words)
+
+    # step 3: get the next word for x number of words (defined by length)
+    # step 4: show to user
     composition = compose(g, words, 100)
-    print(' '.join(composition))
+    return ' '.join(composition)
 
 
 if __name__ == '__main__':
-    main()
+    print(main())
