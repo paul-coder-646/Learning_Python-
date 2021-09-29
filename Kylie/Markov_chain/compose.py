@@ -9,6 +9,9 @@ def get_words_from_text(text_path):
     with open(text_path, 'r') as f:
         text = f.read()
 
+        # remove [text in here] which includes [Intro] [Chorus] and [Outro]
+        text = re.sub(r'\[(.+)\]', ' ', text)
+
         # this removes excess whitespaces and makes spaces uniform
         # text      that look  like this -> text that looks like this
         text = ' '.join(text.split()) 
@@ -55,9 +58,21 @@ def compose(g, words, length=50):
 
     return composition
 
-def main():
+def main(artist):
     # step 1: get words from text
-    words = get_words_from_text('Learning/Kylie/Markov_chain/texts/hp_sorcerer_stone.txt')
+
+    # words = get_words_from_text('Learning/Kylie/Markov_chain/texts/hp_sorcerer_stone.txt')
+
+    # for song lyrics
+    words = []
+    for song_file in os.listdir('Learning/Kylie/Markov_chain/songs/{}'.format(artist)):
+
+        # Exclude this file, as its not a song text :D
+        if song_file == '.DS_Store':
+            continue
+
+        song_words = get_words_from_text(f'Learning/Kylie/Markov_chain/songs/{artist}/{song_file}')
+        words.extend(song_words)
 
     # step 2: create a graph from the words
     g = make_graph(words)
@@ -69,4 +84,6 @@ def main():
 
 
 if __name__ == '__main__':
-    print(main())
+    artist = 'avicii'
+    print('\n')
+    print(main(artist))
